@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# 仮想環境
+venv/
+
+# SQLiteデータベース（生成物）
+*.db
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# 環境変数ファイル（将来追加する場合に備えて）
+.env
+
+CLAUDE.md

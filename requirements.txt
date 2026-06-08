@@ -1,0 +1,19 @@
+# --- 自分でインストールしたライブラリ ---
+
+fastapi==0.136.3          # WebAPI を作るメインのフレームワーク
+uvicorn==0.49.0           # FastAPI を動かすサーバー（python main.py の代わりに使う）
+SQLAlchemy==2.0.50        # SQLite などのDBをPythonで操作するライブラリ
+pydantic==2.13.4          # リクエスト/レスポンスのデータ型を定義・バリデーションするライブラリ
+
+# --- 上記のライブラリが自動でインストールする依存パッケージ ---
+
+annotated-doc==0.0.4      # アノテーション関連のユーティリティ（pydanticの依存）
+annotated-types==0.7.0    # 型アノテーションを補助するライブラリ（pydanticの依存）
+anyio==4.13.0             # 非同期I/O処理の共通インターフェース（uvicornの依存）
+click==8.4.1              # CLIコマンドを作るライブラリ（uvicornの起動コマンドで使用）
+h11==0.16.0               # HTTPプロトコルの低レベル実装（uvicornの依存）
+idna==3.18                # 国際化ドメイン名（日本語ドメインなど）の処理（anyioの依存）
+pydantic_core==2.46.4     # pydanticの高速処理コア（Rustで実装されている）
+starlette==1.2.1          # FastAPIのベースとなるASGIフレームワーク（FastAPIの依存）
+typing-inspection==0.4.2  # 型情報を実行時に調べるユーティリティ（pydanticの依存）
+typing_extensions==4.15.0 # 新しいPythonの型機能を古いバージョンでも使えるようにする
