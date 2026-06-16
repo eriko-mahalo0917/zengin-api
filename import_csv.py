@@ -18,11 +18,11 @@ logger = logger_setup.get_logger()
 #==============================
 CSV_FILE_PATH = "data/zengin.csv"
 
-with open(CSV_FILE_PATH, mode="r", newline="", encoding="utf-8-sig") as csn_file:
+with open(CSV_FILE_PATH, mode="r", newline="", encoding="utf-8-sig") as csv_file:
     # 1行目のヘッダーをキーとして辞書形式で読み込む
     # DictReader で読み込むとこうなる→{"銀行コード": "0001", "銀行名（漢字）": "みずほ", "支店コード": "001", ...}
-    reader = csv.DictReader(csn_file)
-    logger.info("CSVファイルを開きました: {CSV_FILE_PATH}")
+    reader = csv.DictReader(csv_file)
+    logger.info(f"CSVファイルを開きました: {CSV_FILE_PATH}")
     
     
     #==============================
@@ -45,6 +45,7 @@ with open(CSV_FILE_PATH, mode="r", newline="", encoding="utf-8-sig") as csn_file
     # setクラスのインスタンスを作成（重複を自動で除外する組み込みクラス）
     # 「追加済みの銀行コード一覧」を管理する → 同じ銀行コードの重複追加を防ぐ
     added_bank_codes = set()
+    count = 0 #処理カウンター
 
     # 1つ目のフローで読み取ったCSVを1行ずつ辞書として取得する
     # row = {"銀行コード": "0001", "銀行名（漢字）": "みずほ", ...}
@@ -66,10 +67,11 @@ with open(CSV_FILE_PATH, mode="r", newline="", encoding="utf-8-sig") as csn_file
             #セッションの追加(まだDBに追加されない)
             session.add(bank)
             
-            #追加済みとして記録
+            #pythonのset(メモ)に追加済みとして記録(まだDBには追加していない)
             added_bank_codes.add(bank_code)
             
-        #支店情報は全ての行をbranchesテーブルに追加する
+            
+        #支店情報は毎行をbranchesテーブルに追加する
         branch = Branch(
             branch_code=row["支店コード"],
             bank_code=bank_code,
@@ -79,13 +81,26 @@ with open(CSV_FILE_PATH, mode="r", newline="", encoding="utf-8-sig") as csn_file
         
         #セッションの追加(まだDBに追加されない)
         session.add(branch)
+        count += 1 #処理件数をカウント
+        
+        #10000件ごとにcommitしてsessionメモリを解放する
+        if count % 10000 == 0:
+            session.commit()
+            logger.info(f"{count}件処理をしました")
+        
     logger.info(f"CSVの読み込みが完了しました：{len(added_bank_codes)}銀行")
-    
 
 
 
 #==============================
 # 4つ目のフロー
 # DBに保存する
-# → commit() で確定・session を閉じる
+# → 残りの端数をcommit() してsession を閉じる
 #==============================
+# ループ終了後の残りの端数分をcommitする
+session.commit()
+logger.info("DBへの保存が完了しました")
+
+#sessionを閉じてメモリを解放する
+session.close()
+logger.info("セッションを閉じました")
